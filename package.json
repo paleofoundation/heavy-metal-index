@@ -1,22 +1,29 @@
 {
-  "name": "hmi-scaffold",
-  "version": "0.1.0",
+  "name": "hmi",
+  "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "16.2.6",
+    "pg": "^8.13.1",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/pg": "^8.11.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vercel/config": "^0.5.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "typescript": "^5"
