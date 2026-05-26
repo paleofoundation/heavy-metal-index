@@ -61,6 +61,7 @@ npm run typecheck  # tsc --noEmit
 - `main` deploys to production on Vercel.
 - Every PR gets a preview URL.
 - Environment variables live in Vercel — never commit `.env*` files.
+- GitHub repo: <https://github.com/paleofoundation/heavy-metal-index>
 
 ## Directory layout
 
