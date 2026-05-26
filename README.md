@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Heavy Metal Index
 
-## Getting Started
+The engineering foundation for the Heavy Metal Index — a Cochrane-style
+scientific library for heavy-metal contamination evidence, plus a
+brand-certification program built on top of it.
 
-First, run the development server:
+This repo holds the public-facing web app and API. The Index itself
+(schema, data, methodology) lives in the database that this app reads.
+
+## Stack
+
+- Next.js 16 (App Router) on Vercel Fluid Compute
+- TypeScript, Node.js 24 LTS
+- Postgres via Vercel Marketplace (Neon)
+- Configuration in `vercel.ts` (preferred over `vercel.json`)
+- CI: GitHub Actions — lint + typecheck + build on PRs
+
+## Local dev loop
+
+Prerequisites: Node 24+, npm, and the Vercel CLI (`npm i -g vercel`).
 
 ```bash
+# 1. clone
+git clone <repo-url> hmi && cd hmi
+
+# 2. install
+npm install
+
+# 3. link to the Vercel project (one-time per checkout)
+vercel link
+
+# 4. pull env vars from Vercel (DATABASE_URL etc.)
+vercel env pull .env.local
+
+# 5. dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then hit:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- App: <http://localhost:3000>
+- Health check: <http://localhost:3000/api/health>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`/api/health` runs `SELECT NOW()` against the linked Postgres and returns
+`{ status: "ok", db: { ok, now, latencyMs }, timestamp }`. If the DB is
+unreachable the route returns `503` with the error message — that is the
+canary for "is this checkout wired up correctly".
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev        # next dev (Turbopack)
+npm run build      # next build
+npm run start      # next start (production)
+npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployments
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `main` deploys to production on Vercel.
+- Every PR gets a preview URL.
+- Environment variables live in Vercel — never commit `.env*` files.
 
-## Deploy on Vercel
+## Directory layout
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/              Next.js App Router routes
+  api/health/     DB-touching liveness probe
+lib/              Shared server helpers (e.g. db pool)
+.github/workflows CI definitions
+vercel.ts         Vercel project configuration
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Out of scope (for now)
+
+- Auth — not yet wired up; will land via Clerk on the Vercel Marketplace
+  when we need user accounts.
+- UI polish — the app shell is the create-next-app default until we have
+  something to show.
+- AI features — will go through the Vercel AI Gateway when the time
+  comes; do not import provider SDKs directly.
